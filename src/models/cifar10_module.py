@@ -45,7 +45,7 @@ class Resnet18_Custom(LightningModule):
         self.net.fc.bias.requires_grad = True
 
         # loss function
-        self.criterion = torch.nn.CrossEntropyLoss()
+        self.criterion = F.nll_loss()
 
         # metric objects for calculating and averaging accuracy across batches
         self.train_acc = Accuracy()
