@@ -1,0 +1,15 @@
+_target_: src.models.cifar10_module.Resnet18_Custom
+
+optimizer:
+  _target_: torch.optim.SGD
+  _partial_: true
+  lr: 0.03
+  weight_decay: 0.0
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 10
+
