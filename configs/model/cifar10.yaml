@@ -3,7 +3,7 @@ _target_: src.models.cifar10_module.Resnet18_Custom
 optimizer:
   _target_: torch.optim.SGD
   _partial_: true
-  lr: 0.1
+  lr: 0.01
   weight_decay: 1e-6
   momentum: 0.9
 
