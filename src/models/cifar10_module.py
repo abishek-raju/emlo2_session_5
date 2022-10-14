@@ -37,6 +37,12 @@ class Resnet18_Custom(LightningModule):
         self.save_hyperparameters(logger=False, ignore=["net"])
 
         self.net = timm.create_model('resnet18', pretrained=True, num_classes=10)
+        for param in self.net.parameters():
+            param.requires_grad = False
+        #nn.init.xavier_normal_(model.fc.weight)
+        #nn.init.zeros_(model.fc.bias)
+        self.net.fc.weight.requires_grad = True
+        self.net.fc.bias.requires_grad = True
 
         # loss function
         self.criterion = torch.nn.CrossEntropyLoss()
@@ -167,5 +173,5 @@ if __name__ == "__main__":
     import pyrootutils
 
     root = pyrootutils.setup_root(__file__, pythonpath=True)
-    cfg = omegaconf.OmegaConf.load(root / "configs" / "model" / "mnist.yaml")
+    cfg = omegaconf.OmegaConf.load(root / "configs" / "model" / "cifar10.yaml")
     _ = hydra.utils.instantiate(cfg)
