@@ -45,7 +45,7 @@ class Resnet18_Custom(LightningModule):
         self.net.fc.bias.requires_grad = True
 
         # loss function
-        self.criterion = F.nll_loss()
+        self.criterion = F.nll_loss
 
         # metric objects for calculating and averaging accuracy across batches
         self.train_acc = Accuracy()
@@ -154,7 +154,8 @@ class Resnet18_Custom(LightningModule):
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
         optimizer = self.hparams.optimizer(params=self.parameters())
-        scheduler = self.hparams.scheduler(optimizer=optimizer)
+        # scheduler = self.hparams.scheduler(optimizer=optimizer)
+        scheduler = StepLR(optimizer, step_size=70, gamma=0.15)
 
         return {
             "optimizer": optimizer,
