@@ -6,11 +6,7 @@ from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 
 import timm
-
-from torchvision import transforms as T
-import torch.nn.functional as F
-from PIL.Image import Image
-class Resnet18_Custom(LightningModule):
+class Cifar10LitModule(LightningModule):
     """Example of LightningModule for MNIST classification.
 
     A LightningModule organizes your PyTorch code into 6 sections:
@@ -37,12 +33,6 @@ class Resnet18_Custom(LightningModule):
         self.save_hyperparameters(logger=False, ignore=["net"])
 
         self.net = timm.create_model('resnet18', pretrained=True, num_classes=10)
-        for param in self.net.parameters():
-            param.requires_grad = False
-        #nn.init.xavier_normal_(model.fc.weight)
-        #nn.init.zeros_(model.fc.bias)
-        self.net.fc.weight.requires_grad = True
-        self.net.fc.bias.requires_grad = True
 
         # loss function
         self.criterion = torch.nn.CrossEntropyLoss()
@@ -60,27 +50,8 @@ class Resnet18_Custom(LightningModule):
         # for tracking best so far validation accuracy
         self.val_acc_best = MaxMetric()
 
-        self.mean = (0.4914, 0.4822, 0.4465)
-        self.std = (0.2471, 0.2435, 0.2616)
-        self.predict_transform_1 = T.Normalize(self.mean, self.std)
-        self.predict_transform_2 = T.ToTensor()
-
     def forward(self, x: torch.Tensor):
         return self.net(x)
-    
-    @torch.jit.export
-    def forward_jit(self, x):
-
-        with torch.no_grad():
-            # transform the inputs
-            x = self.predict_transform_1(x)
-            # x = self.predict_transform_2(x)
-            # forward pass
-            logits = self.net(x)
-
-            preds = F.softmax(logits, dim=-1)
-
-        return preds
 
     def on_train_start(self):
         # by default lightning executes validation step sanity checks before training starts,
@@ -129,8 +100,6 @@ class Resnet18_Custom(LightningModule):
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True)
-        self.log("hp_metric", self.val_acc_best.compute(), prog_bar=True)
-
 
     def test_step(self, batch: Any, batch_idx: int):
         loss, preds, targets = self.step(batch)
@@ -169,7 +138,7 @@ class Resnet18_Custom(LightningModule):
 
 if __name__ == "__main__":
     import hydra
-    import omegaconfs
+    import omegaconf
     import pyrootutils
 
     root = pyrootutils.setup_root(__file__, pythonpath=True)

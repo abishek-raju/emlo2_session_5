@@ -24,4 +24,3 @@ pytest          # tests
 timm==0.6.7
 gradio
 pylogger
-albumentations==0.4.5
